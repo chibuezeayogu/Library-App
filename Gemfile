@@ -23,7 +23,8 @@ gem 'puma', '~> 3.11'
 # gem 'capistrano-rails', group: :development
 
 # Enforce ruby on rails style guide
-gem 'rubocop', require: false 
+gem 'rubocop', require: false
+
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
@@ -37,10 +38,11 @@ group :development, :test do
   # RSpec tests rails app using BDD approach
   gem 'rspec-rails', '~> 3.5'
   # factory_bot_rails provides integration between factory_girl and rails
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'shoulda-matchers', '~> 3.1', require: false
   gem 'shoulda-callback-matchers', '~> 1.1.1'
   gem 'database_cleaner'
+  gem 'simplecov', require: false, group: :test
 end
 
 group :development do
