@@ -2,7 +2,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/Library-app
   docker:
-    - image: circleci/ruby:2.4.2-jessie-node  # language image
+    - image: circleci/ruby:2.4.1-node-browsers  # language image
       environment:
         BUNDLE_JOBS: 3
         BUNDLE_RETRY: 3
@@ -39,8 +39,9 @@ jobs:
       - run: 
           name: Setup dependencies
           command: |
-            bundle install --without production --path=${BUNDLE_PATH:-vendor/bundle}
-            bundle exec rake db:create db:migrate
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+            bundle exec rake db:create
+            bundle exec rake db:schema:load
       - run: 
           name: Run api tests
           command: |
@@ -58,7 +59,7 @@ jobs:
       - attach_workspace:
           at: ~/Library-app/tmp
       - run:
-        name: Upload coverage results to Code Climate
+          name: Upload coverage results to Code Climate
           command: |
             ./tmp/cc-test-reporter upload-coverage -i codeclimate.test.json
 workflows:
