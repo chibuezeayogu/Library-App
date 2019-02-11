@@ -4,12 +4,12 @@ class JsonWebToken
   class << self
     def encode(payload)
       payload.reverse_merge!(meta)
-      JWT.encode(payload, Rails.application.credentials.secret_key_base)
+      JWT.encode(payload, Rails.application.credentials.fetch(:secret_key_base))
     end
 
     # Decodes the JWT with the signed secret
     def decode(token)
-      JWT.decode(token, Rails.application.credentials.secret_key_base)
+      JWT.decode(token, Rails.application.credentials.fetch(:secret_key_base))
     end
 
     # Validates the payload hash for expiration and meta claims

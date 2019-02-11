@@ -2,7 +2,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/Library-app
   docker:
-    - image: circleci/ruby:2.4.1-node-browsers  # language image
+    - image: circleci/ruby:2.4.1  # language image
       environment:
         BUNDLE_JOBS: 3
         BUNDLE_RETRY: 3
@@ -30,12 +30,18 @@ jobs:
           root: tmp
           paths:
             - cc-test-reporter
-  Tests:
+  backend-tests:
     <<: *defaults
     steps:
       - checkout
       - attach_workspace:
           at: ~/Library-app/tmp
+      - run:
+          name: Configure Bundler
+          command: |
+            echo 'export BUNDLER_VERSION=$(cat Gemfile.lock | tail -1 | tr -d " ")' >> $BASH_ENV
+            source $BASH_ENV
+            gem install bundler
       - run: 
           name: Setup dependencies
           command: |
@@ -46,31 +52,33 @@ jobs:
           name: Run api tests
           command: |
             bundle exec rake
-            ./tmp/cc-test-reporter format-coverage -t simplecov -o tmp/codeclimate.test.json
+            ./tmp/cc-test-reporter format-coverage -t simplecov -o tmp/codeclimate.test.json coverage/backend-test/.resultset.json
       - persist_to_workspace:
           root: tmp
           paths: 
             - codeclimate.test.json
-    upload-coverage:
-      <<: *defaults
-      environment:
-        CC_TEST_REPORTER_ID: 106cdcdc9eb9c2c8da5b3077332648ea6c270ee1dd66340fc669608558a8f969
-      steps:
+  upload-coverage:
+    <<: *defaults
+    environment:
+      - CC_TEST_REPORTER_ID: 106cdcdc9eb9c2c8da5b3077332648ea6c270ee1dd66340fc669608558a8f969
+    steps:
       - attach_workspace:
           at: ~/Library-app/tmp
       - run:
           name: Upload coverage results to Code Climate
           command: |
-            ./tmp/cc-test-reporter upload-coverage -i codeclimate.test.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.test.json
+
 workflows:
   version: 2
+
   commit:
     jobs:
       - build
-      - Tests:
+      - backend-tests:
           requires:
             - build
       - upload-coverage:
           requires:
-            - Tests
+            - backend-tests
 
