@@ -29,7 +29,7 @@ RSpec.describe 'Users API', type: :request do
       end
 
       it 'returns a validation error message' do
-        expect(json['errors']).to match(["Email is invalid"])
+        expect(json['errors']).to match(['Email is invalid'])
       end
 
       it 'should respone with status 400 bad request' do
