@@ -3,16 +3,18 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      def create
-        @user = User.new(user_params)
+      skip_before_action :authenticate_request
 
-        if @user.save
-          token = JsonWebToken.encode(id: @user.id, email: @user.email)
-          render :create, locals: {
-            token: token
-          }, status: :created
+      def create
+        user = User.new(user_params)
+
+        if user.save
+          token = JsonWebToken.encode(id: user.id, email: user.email)
+          response = { message: Message.account_created, token: token }
+          json_response(response, :created)
         else
-          render json: { errors: @user.errors.full_messages }, status: :bad_request
+
+          json_response({ message: user.errors.full_messages }, :bad_request)
         end
       end
 

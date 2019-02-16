@@ -3,6 +3,8 @@
 module Api
   module V1
     class SessionsController < ApplicationController
+      skip_before_action :authenticate_request
+
       def index
         render :index, status: :ok
       end
@@ -12,12 +14,10 @@ module Api
 
         if @user&.valid_password?(params[:password])
           token = JsonWebToken.encode(id: @user.id, email: @user.email)
-          render :create, locals: {
-            message: 'Logged in successfully',
-            token: token
-          }, status: :ok
+          response = { message: Message.account_login, token: token }
+          json_response(response, :ok)
         else
-          render json: { error: 'invalid credentials' }, status: :unauthorized
+          json_response({ message: Message.invalid_credentials }, :unauthorized)
         end
       end
     end

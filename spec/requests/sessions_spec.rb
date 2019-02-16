@@ -25,15 +25,6 @@ RSpec.describe 'Sessions API', type: :request do
         expect(json['message']).to match('Welcome to my Library App')
       end
     end
-
-    context 'when a registered user log\'s in' do
-      before { post '/api/v1/users/login', params: registered_user }
-
-      it 'returns a message and a token' do
-        expect(json['data']).to include('message', 'token')
-        expect(json['data']['message']).to eq('Logged in successfully')
-      end
-    end
   end
 
   describe 'POST /api/v1/user/login' do
@@ -41,7 +32,7 @@ RSpec.describe 'Sessions API', type: :request do
       before { post '/api/v1/users/login', params: unregistered_user }
 
       it 'returns invalid credentials' do
-        expect(json['error']).to match('invalid credentials')
+        expect(json['message']).to match('Invalid credentials')
       end
     end
 
@@ -49,8 +40,8 @@ RSpec.describe 'Sessions API', type: :request do
       before { post '/api/v1/users/login', params: registered_user }
 
       it 'returns a message and a token' do
-        expect(json['data']).to include('message', 'token')
-        expect(json['data']['message']).to eq('Logged in successfully')
+        expect(json).to include('message', 'token')
+        expect(json['message']).to eq('Logged in successfully')
       end
     end
   end
