@@ -17,7 +17,7 @@ RSpec.describe 'Users API', type: :request do
       end
 
       it 'returns a validation error message' do
-        expect(json['errors'])
+        expect(json['message'])
           .to match(['Email can\'t be blank', 'Password can\'t be blank'])
       end
     end
@@ -29,7 +29,7 @@ RSpec.describe 'Users API', type: :request do
       end
 
       it 'returns a validation error message' do
-        expect(json['errors']).to match(['Email is invalid'])
+        expect(json['message']).to match(['Email is invalid'])
       end
 
       it 'should respone with status 400 bad request' do
@@ -41,7 +41,7 @@ RSpec.describe 'Users API', type: :request do
       before { post '/api/v1/users/signup', params: params }
 
       it 'creates a new user' do
-        expect(json).to include('data')
+        expect(json['message']).to match('Account created successfully')
       end
 
       it 'should respone with status 201' do
